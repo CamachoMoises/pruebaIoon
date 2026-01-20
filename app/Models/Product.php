@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use SoftDeletes, HasFactory;
 
     protected $fillable = [
         'uuid',

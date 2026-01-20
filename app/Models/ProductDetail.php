@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductDetail extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use SoftDeletes, HasFactory;
 
     protected $fillable = [
         'uuid', 'name', 'description', 'status_id', 'product_id', 'language_id'

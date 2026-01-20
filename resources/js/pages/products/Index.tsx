@@ -143,44 +143,44 @@ export default function ProductsIndex({
                                                 <code className="rounded bg-blue-100 px-1">
                                                     categoria
                                                 </code>{' '}
-                                                - Category name
+                                                - Nombre de la categoria
                                             </li>
                                             <li>
                                                 <code className="rounded bg-blue-100 px-1">
                                                     nombre
                                                 </code>{' '}
-                                                - Product name (Spanish)
+                                                - Nombre del producto (Español)
                                             </li>
                                             <li>
                                                 <code className="rounded bg-blue-100 px-1">
                                                     descripcion
                                                 </code>{' '}
-                                                - Product description (Spanish)
+                                                - Descripcion del Producto
+                                                (Español)
                                             </li>
                                             <li>
                                                 <code className="rounded bg-blue-100 px-1">
                                                     precio
                                                 </code>{' '}
-                                                - Product price (decimal, e.g.,
-                                                299.99)
+                                                - Precio Producto (decimales,
+                                                e.g., 299.99)
                                             </li>
                                             <li>
                                                 <code className="rounded bg-blue-100 px-1">
                                                     stock
                                                 </code>{' '}
-                                                - Stock quantity (integer)
+                                                - Stock (Entero)
                                             </li>
                                             <li>
                                                 <code className="rounded bg-blue-100 px-1">
                                                     fecha_ultima_venta
                                                 </code>{' '}
-                                                - Last sale date (YYYY-MM-DD,
-                                                optional)
+                                                - Ultima fecha de venta
+                                                (YYYY-MM-DD, opcional)
                                             </li>
                                         </ul>
                                         <p className="mt-2 text-xs text-blue-600">
-                                            Note: All products will be imported
-                                            in Spanish language
+                                            Nota: Todos los productos seran importados por defecto en español.
                                         </p>
                                     </div>
 
@@ -203,7 +203,7 @@ export default function ProductsIndex({
                                                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                                                 />
                                             </svg>
-                                            Download CSV Template
+                                            Descargar plantilla CSV
                                         </a>
                                     </div>
 
@@ -213,14 +213,14 @@ export default function ProductsIndex({
                                             htmlFor="csv_file"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Select CSV File
+                                            Selecionar archivo CSV
                                         </label>
                                         <div className="mt-2">
                                             <input
                                                 ref={fileInputRef}
                                                 id="csv_file"
                                                 type="file"
-                                                accept=".csv"
+                                                accept=".tsv,.csv,text/tab-separated-values,text/csv"
                                                 onChange={handleFileChange}
                                                 className="block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
                                             />
@@ -232,7 +232,7 @@ export default function ProductsIndex({
                                         )}
                                         {data.csv_file && (
                                             <p className="mt-2 text-sm text-gray-600">
-                                                Selected: {data.csv_file.name}
+                                                Selecionado: {data.csv_file.name}
                                             </p>
                                         )}
                                     </div>
@@ -243,7 +243,7 @@ export default function ProductsIndex({
                                             onClick={handleCancelImport}
                                             className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
                                         >
-                                            Cancel
+                                            Cancelar
                                         </button>
                                         <button
                                             type="submit"
@@ -273,7 +273,7 @@ export default function ProductsIndex({
                                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                                         ></path>
                                                     </svg>
-                                                    Processing...
+                                                    Procesando...
                                                 </>
                                             ) : (
                                                 <>
@@ -290,7 +290,7 @@ export default function ProductsIndex({
                                                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                                                         />
                                                     </svg>
-                                                    Import Products
+                                                    Importar Productos
                                                 </>
                                             )}
                                         </button>
