@@ -15,7 +15,7 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'stock' => 'integer',
+
         'price' => 'decimal:2',
         'last_sale' => 'datetime',
         'created_at' => 'datetime',
@@ -38,44 +38,36 @@ class Product extends Model
         return $this->hasMany(ProductDetail::class);
     }
 
-    public function detail()
+
+    public function productDetails()
     {
-        return $this->hasOne(ProductDetail::class)
-                    ->defaultLanguage()
-                    ->active();
+        return $this->hasMany(ProductDetail::class);
     }
 
-    public function detailByLanguage($languageCode = null)
+    // Métodos útiles
+    public function detailByLanguage($languageCode = 'es')
     {
-        if (!$languageCode) {
-            $languageCode = app()->getLocale();
-        }
-
         return $this->details()
-                    ->byLanguage($languageCode)
-                    ->active()
-                    ->first();
+            ->whereHas('language', function($query) use ($languageCode) {
+                $query->where('code', $languageCode);
+            })
+            ->first();
+    }
+
+    public function getDefaultDetailAttribute()
+    {
+        return $this->detailByLanguage('es');
     }
 
     public function scopeActive($query)
     {
         return $query->whereHas('status', function($q) {
-            $q->where('value', Status::ACTIVO);
+            $q->where('value', 'activo');
         });
     }
 
     public function scopeWithLastSale($query)
     {
         return $query->whereNotNull('last_sale');
-    }
-
-    public function scopeWithDetails($query, $languageCode = null)
-    {
-        return $query->with(['details' => function($q) use ($languageCode) {
-            if ($languageCode) {
-                $q->byLanguage($languageCode);
-            }
-            $q->active();
-        }]);
     }
 }
