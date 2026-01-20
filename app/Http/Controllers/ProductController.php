@@ -27,20 +27,21 @@ class ProductController extends Controller
 
         $languages = Language::where('status_id', 1)->get();
 
-        return Inertia::render('Products/Index', [
+        return Inertia::render('products/Index', [
             'products' => $products,
             'languages' => $languages,
             'selectedLanguage' => $languageId
         ]);
     }
 
-    public function show(Product $product, Request $request): Response
+    public function show(string $id, Request $request): Response
     {
+        $product = Product::with(['category', 'status'])
+            ->findOrFail($id);
+
         $languageId = $request->get('language_id', Language::where('is_default', true)->first()?->id);
 
         $product->load([
-            'category',
-            'status',
             'productDetails' => function ($query) use ($languageId) {
                 $query->where('language_id', $languageId);
             }
@@ -48,7 +49,7 @@ class ProductController extends Controller
 
         $languages = Language::where('status_id', 1)->get();
 
-        return Inertia::render('Products/Show', [
+        return Inertia::render('products/Show', [
             'product' => $product,
             'languages' => $languages,
             'selectedLanguage' => $languageId

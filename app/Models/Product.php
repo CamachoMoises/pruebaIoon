@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -11,11 +12,16 @@ class Product extends Model
     use HasUuids, SoftDeletes, HasFactory;
 
     protected $fillable = [
-        'uuid', 'stock', 'price', 'category_id', 'status_id', 'last_sale'
+        'uuid',
+        'stock',
+        'price',
+        'category_id',
+        'status_id',
+        'last_sale'
     ];
 
     protected $casts = [
-
+        'stock' => 'integer',
         'price' => 'decimal:2',
         'last_sale' => 'datetime',
         'created_at' => 'datetime',
@@ -38,17 +44,49 @@ class Product extends Model
         return $this->hasMany(ProductDetail::class);
     }
 
-
     public function productDetails()
     {
         return $this->hasMany(ProductDetail::class);
     }
 
-    // Métodos útiles
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->whereHas('status', function ($q) {
+            $q->where('value', 'activo');
+        });
+    }
+
+    public function scopeWithCategory($query)
+    {
+        return $query->whereNotNull('category_id');
+    }
+
+    public function scopeWithoutCategory($query)
+    {
+        return $query->whereNull('category_id');
+    }
+
+    public function scopeWithLastSale($query)
+    {
+        return $query->whereNotNull('last_sale');
+    }
+
+
+    public function hasCategory(): bool
+    {
+        return !is_null($this->category_id);
+    }
+
+    public function getCategoryNameAttribute(): string
+    {
+        return $this->category ? $this->category->name : 'Sin categoría';
+    }
+
     public function detailByLanguage($languageCode = 'es')
     {
         return $this->details()
-            ->whereHas('language', function($query) use ($languageCode) {
+            ->whereHas('language', function ($query) use ($languageCode) {
                 $query->where('code', $languageCode);
             })
             ->first();
@@ -57,17 +95,5 @@ class Product extends Model
     public function getDefaultDetailAttribute()
     {
         return $this->detailByLanguage('es');
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->whereHas('status', function($q) {
-            $q->where('value', 'activo');
-        });
-    }
-
-    public function scopeWithLastSale($query)
-    {
-        return $query->whereNotNull('last_sale');
     }
 }

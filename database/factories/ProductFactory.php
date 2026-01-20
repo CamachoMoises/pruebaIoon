@@ -33,15 +33,41 @@ class ProductFactory extends Factory
         ];
 
         return [
-            // 'id' NO se incluye aquí - es auto-increment
             'uuid' => Str::uuid(),
-            'stock'=> $this->faker->numberBetween(0, 20),
             'price' => $this->faker->randomFloat(2, 10, 5000),
-            'category_id' => Category::inRandomOrder()->first()->id ?? Category::factory(),
-            'status_id' => Status::inRandomOrder()->first()->id ?? Status::factory(),
+            'category_id' => $this->faker->optional(0.7)->passthrough( // 70% con categoría
+                Category::inRandomOrder()->first()->id ?? Category::factory()
+            ),
+            'status_id' => Status::where('value', 'activo')->first()->id ??
+                Status::factory()->create(['value' => 'activo'])->id,
             'last_sale' => $this->faker->optional(0.7)->dateTimeBetween('-1 year', 'now'),
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    // Nuevos estados para la factory
+    public function withCategory()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'category_id' => Category::inRandomOrder()->first()->id ??
+                    Category::factory()->create()->id,
+            ];
+        });
+    }
+
+    public function withoutCategory()
+    {
+        return $this->state([
+            'category_id' => null,
+        ]);
+    }
+
+    public function withSpecificCategory($categoryId)
+    {
+        return $this->state([
+            'category_id' => $categoryId,
+        ]);
     }
 }

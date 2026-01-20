@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/AppLayout';
 import { Product } from '@/types/models';
+import { Head } from '@inertiajs/react';
 
 interface DashboardProps {
     stats: {
@@ -77,7 +77,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="truncate text-sm font-medium text-gray-500">
-                                                Categories
+                                                Categorias
                                             </dt>
                                             <dd className="text-3xl font-semibold text-gray-900">
                                                 {stats.total_categories}
@@ -109,7 +109,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="truncate text-sm font-medium text-gray-500">
-                                                Active Languages
+                                                Idiomas cargados
                                             </dt>
                                             <dd className="text-3xl font-semibold text-gray-900">
                                                 {stats.active_languages}
@@ -134,20 +134,33 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
                                             <p className="text-sm font-medium text-gray-900">
-                                                {product.product_details?.[0]?.name ||
-                                                    'No name'}
+                                                {product.product_details?.[0]
+                                                    ?.name || 'No name'}
                                             </p>
-                                            <p className="text-sm text-gray-500">
-                                                {product.category?.name}
-                                            </p>
+                                            {product.category_id ? (
+                                                <p className="text-sm text-gray-500">
+                                                    {product.category?.name}
+                                                </p>
+                                            ) : (
+                                                <p className="text-sm text-gray-500 italic">
+                                                    Sin categoria
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="text-right">
+                                            <p
+                                                className={`text-sm font-semibold text-gray-900 ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}
+                                            >
+                                                {product.stock > 0
+                                                    ? `En stock ${product.stock}`
+                                                    : 'Sin stock'}
+                                            </p>
                                             <p className="text-sm font-semibold text-gray-900">
                                                 ${product.price}
                                             </p>
                                             <p className="text-xs text-gray-500">
                                                 {new Date(
-                                                    product.created_at
+                                                    product.created_at,
                                                 ).toLocaleDateString()}
                                             </p>
                                         </div>

@@ -37,7 +37,7 @@ export interface Product {
     uuid: string;
     stock: number;
     price: number;
-    category_id: number;
+    category_id: number | null;
     status_id: number;
     last_sale: string | null;
     created_at: string;

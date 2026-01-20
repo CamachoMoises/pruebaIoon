@@ -13,7 +13,10 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->integer('stock');
             $table->decimal('price', 10, 2);
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('category_id')
+                ->nullable()
+                ->constrained('categories')
+                ->onDelete('set null');
             $table->foreignId('status_id')->constrained('statuses')->default(1);
             $table->timestamp('last_sale')->nullable();
             $table->timestamps();

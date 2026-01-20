@@ -10,7 +10,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Limpiar tablas (opcional)
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         DB::table('product_details')->truncate();
@@ -21,7 +20,6 @@ class DatabaseSeeder extends Seeder
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // 2. Crear status
         $statuses = [
             ['id' => 1, 'name' => 'Activo', 'value' => 'activo'],
             ['id' => 2, 'name' => 'Inactivo', 'value' => 'inactivo'],
@@ -40,7 +38,6 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 3. Crear idiomas
         $languages = [
             ['id' => 1, 'name' => 'Español', 'code' => 'es', 'is_default' => true],
             ['id' => 2, 'name' => 'English', 'code' => 'en', 'is_default' => false],
@@ -77,31 +74,45 @@ class DatabaseSeeder extends Seeder
                 [
                     'uuid' => Str::uuid(),
                     'name' => $category['name'],
-                    'status_id' => 1, // Activo
+                    'status_id' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
             );
         }
 
-        // 5. Crear productos
+
         $products = [];
         $productCounter = 1;
 
         foreach ($categories as $category) {
-            for ($i = 1; $i <= 5; $i++) { // 5 productos por categoría
+            for ($i = 1; $i <= 5; $i++) {
                 $products[] = [
                     'uuid' => Str::uuid(),
                     'stock' => rand(10, 100),
-                    'price' => rand(1000, 50000) / 100, // 10.00 - 500.00
+                    'price' => rand(1000, 50000) / 100,
                     'category_id' => $category['id'],
-                    'status_id' => 1, // Activo
+                    'status_id' => 1,
                     'last_sale' => rand(0, 1) ? now()->subDays(rand(1, 30)) : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
                 $productCounter++;
             }
+        }
+        // crear productos sin categoria
+        for ($i = 1; $i <= 5; $i++) {
+            $products[] = [
+                'uuid' => Str::uuid(),
+                'stock' => rand(10, 100),
+                'price' => rand(1000, 50000) / 100,
+                'category_id' => null,
+                'status_id' => 1,
+                'last_sale' => rand(0, 1) ? now()->subDays(rand(1, 30)) : null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            $productCounter++;
         }
 
         DB::table('products')->insert($products);
@@ -115,8 +126,8 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Producto ' . $productId,
                 'description' => 'Descripción detallada del producto ' . $productId . ' en español.',
                 'product_id' => $productId,
-                'language_id' => 1, // Español
-                'status_id' => 1, // Activo
+                'language_id' => 1,
+                'status_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -127,8 +138,8 @@ class DatabaseSeeder extends Seeder
                     'name' => 'Product ' . $productId,
                     'description' => 'Detailed description of product ' . $productId . ' in English.',
                     'product_id' => $productId,
-                    'language_id' => 2, // English
-                    'status_id' => 1, // Activo
+                    'language_id' => 2,
+                    'status_id' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -140,8 +151,8 @@ class DatabaseSeeder extends Seeder
                     'name' => 'Produit ' . $productId,
                     'description' => 'Description détaillée du produit ' . $productId . ' en français.',
                     'product_id' => $productId,
-                    'language_id' => 3, // Français
-                    'status_id' => 1, // Activo
+                    'language_id' => 3,
+                    'status_id' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];

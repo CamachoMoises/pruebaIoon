@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Language;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,16 +16,30 @@ class CategoryController extends Controller
             ->latest()
             ->paginate(15);
 
-        return Inertia::render('Categories/Index', [
+        return Inertia::render('categories/Index', [
             'categories' => $categories
         ]);
     }
 
-    public function show(Category $category): Response
+    public function show(string $id): Response
     {
-        $category->load(['status', 'products.productDetails']);
+        $category = Category::findOrFail($id);
 
-        return Inertia::render('Categories/Show', [
+        $defaultLanguage = Language::where('is_default', true)->first();
+
+        $category->load([
+            'status',
+            'products' => function ($query) use ($defaultLanguage) {
+                $query->with([
+                    'status',
+                    'productDetails' => function ($q) use ($defaultLanguage) {
+                        $q->where('language_id', $defaultLanguage->id);
+                    }
+                ]);
+            }
+        ]);
+
+        return Inertia::render('categories/Show', [
             'category' => $category
         ]);
     }
