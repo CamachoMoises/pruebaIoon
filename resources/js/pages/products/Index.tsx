@@ -134,9 +134,8 @@ export default function ProductsIndex({
                                             CSV Format Requirements
                                         </h3>
                                         <p className="mb-2 text-sm text-blue-800">
-                                            Your CSV file should contain the
-                                            following columns (in this exact
-                                            order):
+                                            Tu archivo CSV debe tener las siguientes
+                                            columnas:
                                         </p>
                                         <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">
                                             <li>
