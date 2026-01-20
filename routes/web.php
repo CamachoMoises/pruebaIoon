@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Ruta vacía por ahora
 Route::get('/', function () {
-    return ['Laravel' => app()->version()];
+    return Inertia::render('Welcome');
 });
