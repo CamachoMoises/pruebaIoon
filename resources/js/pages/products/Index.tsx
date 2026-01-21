@@ -122,20 +122,19 @@ export default function ProductsIndex({
                         <div className="mb-8 overflow-hidden rounded-lg bg-white shadow">
                             <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
                                 <h2 className="text-lg font-semibold text-gray-900">
-                                    Import Products from CSV
+                                    Importar Productos desde CSV
                                 </h2>
                             </div>
 
                             <div className="p-6">
                                 <form onSubmit={handleImportSubmit}>
-                                    {/* CSV Format Info */}
                                     <div className="mb-6 rounded-lg bg-blue-50 p-4">
                                         <h3 className="mb-2 text-sm font-semibold text-blue-900">
-                                            CSV Format Requirements
+                                            Formato del CSV
                                         </h3>
                                         <p className="mb-2 text-sm text-blue-800">
-                                            Tu archivo CSV debe tener las siguientes
-                                            columnas:
+                                            Tu archivo CSV debe tener las
+                                            siguientes columnas:
                                         </p>
                                         <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">
                                             <li>
@@ -179,7 +178,8 @@ export default function ProductsIndex({
                                             </li>
                                         </ul>
                                         <p className="mt-2 text-xs text-blue-600">
-                                            Nota: Todos los productos seran importados por defecto en español.
+                                            Nota: Todos los productos seran
+                                            importados por defecto en español.
                                         </p>
                                     </div>
 
@@ -231,7 +231,8 @@ export default function ProductsIndex({
                                         )}
                                         {data.csv_file && (
                                             <p className="mt-2 text-sm text-gray-600">
-                                                Selecionado: {data.csv_file.name}
+                                                Selecionado:{' '}
+                                                {data.csv_file.name}
                                             </p>
                                         )}
                                     </div>
