@@ -331,12 +331,12 @@ export default function ProductsIndex({
                                             <div className="p-4">
                                                 <h3 className="mb-2 text-lg font-semibold text-gray-900 group-hover:text-indigo-600">
                                                     {detail?.name ||
-                                                        'No name available'}
+                                                        'Nombre no disponible'}
                                                 </h3>
 
                                                 <p className="mb-3 line-clamp-2 text-sm text-gray-600">
                                                     {detail?.description ||
-                                                        'No description available'}
+                                                        'Sin descripción disponible'}
                                                 </p>
 
                                                 <div className="flex items-center justify-between">

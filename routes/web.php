@@ -4,8 +4,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
+Route::get('/', function () {
+    return redirect('/dashboard');
+});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

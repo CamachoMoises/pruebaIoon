@@ -62,21 +62,20 @@ class ProductController extends Controller
 
     public function downloadTemplate(): HttpResponse
     {
-        $csvContent = "categoria\tnombre\tdescripcion\tprecio\tstock\tfecha_ultima_venta\n";
-        $csvContent .= "Electrónica\t\t\t\t\t\n";
-        $csvContent .= "Electrónica\tSmartphone XYZ\tTeléfono inteligente con cámara de 48MP\t299.99\t50\t2026-01-15\n";
-        $csvContent .= "Electrónica\tTablet ABC\tTablet de 10 pulgadas con stylus\t199.99\t30\t2026-01-10\n";
-        $csvContent .= "Ropa\t\t\t\t\t\n";
-        $csvContent .= "Ropa\tCamiseta Deportiva\tCamiseta de alto rendimiento\t49.99\t100\t2026-01-18\n";
-        $csvContent .= "Ropa\tPantalón Jogger\tPantalón deportivo cómodo\t79.99\t75\t2026-01-12\n";
-        $csvContent .= "Hogar\t\t\t\t\t\n";
-        $csvContent .= "Hogar\tCafetera Automática\tCafetera programable con molinillo\t129.99\t30\t\n";
+        $csvContent = "categoria,nombre,descripcion,precio,stock,fecha_ultima_venta\n";
+        $csvContent .= "Electrónica,,,,,\n";
+        $csvContent .= "Electrónica,Smartphone XYZ,Teléfono inteligente con cámara de 48MP,299.99,50,2026-01-15\n";
+        $csvContent .= "Electrónica,Tablet ABC,Tablet de 10 pulgadas con stylus,199.99,30,2026-01-10\n";
+        $csvContent .= "Ropa,,,,,\n";
+        $csvContent .= "Ropa,Camiseta Deportiva,Camiseta de alto rendimiento,49.99,100,2026-01-18\n";
+        $csvContent .= "Ropa,Pantalón Jogger,Pantalón deportivo cómodo,79.99,75,2026-01-12\n";
+        $csvContent .= "Hogar,,,,,\n";
+        $csvContent .= "Hogar,Cafetera Automática,Cafetera programable con molinillo,129.99,30,\n";
 
         return response($csvContent, 200)
-            ->header('Content-Type', 'text/tab-separated-values')
-            ->header('Content-Disposition', 'attachment; filename="products_template.tsv"');
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="products_template.csv"');
     }
-
 
     public function import(Request $request)
     {
@@ -93,7 +92,7 @@ class ProductController extends Controller
             }
 
             $rows = array_map(function ($line) {
-                return str_getcsv($line, "\t");
+                return str_getcsv($line, ",");
             }, explode("\n", $content));
             if (count($rows) < 2) {
                 return back()->withErrors(['csv_file' => 'El archivo CSV está vacío o no tiene el formato correcto.']);
@@ -112,7 +111,6 @@ class ProductController extends Controller
             $currentCategoryName = null;
             $importedCount = 0;
             $errors = [];
-
             for ($i = 1; $i < count($rows); $i++) {
                 $row = $rows[$i];
                 if (empty(array_filter($row))) {
@@ -179,6 +177,7 @@ class ProductController extends Controller
                     $errors[] = "Fila " . ($i + 1) . ": Error al crear producto '$nombre': " . $e->getMessage();
                 }
             }
+
             if ($importedCount > 0 && empty($errors)) {
                 return redirect()->route('products.index')
                     ->with('success', "Se importaron $importedCount productos exitosamente.");
@@ -188,7 +187,6 @@ class ProductController extends Controller
             } else {
                 return back()->withErrors(['csv_file' => 'No se pudo importar ningún producto. ' . implode('; ', array_slice($errors, 0, 5))]);
             }
-
         } catch (\Exception $e) {
             return back()->withErrors(['csv_file' => 'Error al procesar el archivo: ' . $e->getMessage()]);
         }
