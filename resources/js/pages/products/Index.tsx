@@ -1,21 +1,27 @@
 import AppLayout from '@/layouts/AppLayout';
 import { Language, PaginatedData, Product } from '@/types/models';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 interface ProductsIndexProps {
     products: PaginatedData<Product>;
     languages: Language[];
     selectedLanguage: number;
+    filters: {
+        search?: string;
+    };
 }
 
 export default function ProductsIndex({
     products,
     languages,
     selectedLanguage,
+    filters,
 }: ProductsIndexProps) {
     const [isImportOpen, setIsImportOpen] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const searchTimeout = useRef<NodeJS.Timeout>(null);
+    const [searchQuery, setSearchQuery] = useState(filters.search || '');
 
     const { data, setData, post, processing, errors, reset } = useForm({
         csv_file: null as File | null,
@@ -65,10 +71,42 @@ export default function ProductsIndex({
         }
     };
 
+    useEffect(() => {
+        searchTimeout.current = setTimeout(() => {
+            if (searchQuery === filters.search) {
+                return;
+            }
+            router.get(
+                '/products',
+                {
+                    search: searchQuery || undefined,
+                    language_id: selectedLanguage,
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 800);
+
+        return () => {
+            if (searchTimeout.current) {
+                clearTimeout(searchTimeout.current);
+            }
+        };
+    }, [searchQuery]);
+    const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
+    };
+
     return (
         <AppLayout>
             <Head title="Products" />
-
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="mb-8 flex items-center justify-between">
@@ -76,47 +114,109 @@ export default function ProductsIndex({
                             Productos
                         </h1>
 
-                        <div className="flex items-center gap-4">
-                            <label
-                                htmlFor="language"
-                                className="text-sm font-medium text-gray-700"
-                            >
-                                Idioma:
-                            </label>
-                            <select
-                                id="language"
-                                value={selectedLanguage}
-                                onChange={(e) =>
-                                    handleLanguageChange(Number(e.target.value))
-                                }
-                                className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            >
-                                {languages.map((lang) => (
-                                    <option key={lang.id} value={lang.id}>
-                                        {lang.name} ({lang.code})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <button
-                            onClick={() => setIsImportOpen(!isImportOpen)}
-                            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-                        >
-                            <svg
-                                className="h-5 w-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 4v16m8-8H4"
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="relative max-w-md flex-1">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <svg
+                                        className="h-5 w-5 text-gray-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                        />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    placeholder="Buscar en productos"
+                                    className="block w-full rounded-md border-gray-300 pr-10 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 />
-                            </svg>
-                            Importar CSV
-                        </button>
+                                {searchQuery && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                                    >
+                                        <svg
+                                            className="h-5 w-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <label
+                                        htmlFor="language"
+                                        className="text-sm font-medium whitespace-nowrap text-gray-700"
+                                    >
+                                        Idioma:
+                                    </label>
+                                    <select
+                                        id="language"
+                                        value={selectedLanguage}
+                                        onChange={(e) =>
+                                            handleLanguageChange(
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                        className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+                                        {languages.map((lang) => (
+                                            <option
+                                                key={lang.id}
+                                                value={lang.id}
+                                            >
+                                                {lang.name} ({lang.code})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <button
+                                    onClick={() =>{
+                                        setIsImportOpen(!isImportOpen)
+                                        clearSearch()
+                                    }
+
+                                    }
+                                    className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold whitespace-nowrap text-white shadow-sm hover:bg-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
+                                >
+                                    <svg
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M12 4v16m8-8H4"
+                                        />
+                                    </svg>
+                                    Importar CSV
+                                </button>
+                            </div>
+                        </div>
+
+
                     </div>
                     {isImportOpen && (
                         <div className="mb-8 overflow-hidden rounded-lg bg-white shadow">
@@ -299,6 +399,38 @@ export default function ProductsIndex({
                             </div>
                         </div>
                     )}
+                    <div className='my-5'>
+                    {searchQuery && (
+                            <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+                                <span>Buscando:</span>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-3 py-1 font-medium text-indigo-700">
+                                    "{searchQuery}"
+                                    <button
+                                        onClick={clearSearch}
+                                        className="ml-1 hover:text-indigo-900"
+                                    >
+                                        <svg
+                                            className="h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </button>
+                                </span>
+                                <span className="text-gray-500">
+                                    ({products.total} resultados)
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
                     {products.data.length > 0 ? (
                         <>
                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -430,7 +562,7 @@ export default function ProductsIndex({
                                                             key={index}
                                                             href={
                                                                 link.url
-                                                                    ? `${link.url}&language_id=${selectedLanguage}`
+                                                                    ? `${link.url}&language_id=${selectedLanguage}&search=${searchQuery}`
                                                                     : '#'
                                                             }
                                                             className={`relative inline-flex items-center px-4 py-2 text-sm font-medium ${

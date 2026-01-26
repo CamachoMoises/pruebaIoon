@@ -17,24 +17,49 @@ class ProductController extends Controller
     public function index(Request $request): Response
     {
         $languageId = $request->get('language_id', Language::where('is_default', true)->first()?->id);
+        $search = $request->get('search');
 
-        $products = Product::with([
+        $query = Product::with([
             'category',
             'status',
             'productDetails' => function ($query) use ($languageId) {
                 $query->where('language_id', $languageId);
             }
         ])
-            ->whereHas('status', fn($q) => $q->where('value', 'activo'))
-            ->latest()
-            ->paginate(15);
+        ->whereHas('status', fn($q) => $q->where('value', 'activo'));
 
+        if ($search) {
+            $search = trim(strtolower($search));
+            $query->where(function ($q) use ($search, $languageId) {
+                $q->whereHas('productDetails', function ($subQ) use ($search, $languageId) {
+                    $subQ->where('language_id', $languageId)
+                        ->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('description', 'like', '%' . $search . '%');
+                });
+                if (is_numeric($search)){
+                    $searchNumber = floatval($search);
+                    $q->orWhere(function ($priceQ) use ($searchNumber){
+                        $priceQ->where('price', '=', $searchNumber)
+                            ->orWhere('price', 'like', $searchNumber . '%')
+                            ->orWhereBetween('price', [
+                                $searchNumber * 0.9,
+                                $searchNumber * 1.1
+                            ]);
+                    });
+                }
+            });
+        }
+
+        $products = $query->latest()->paginate(15)->withQueryString();
         $languages = Language::where('status_id', 1)->get();
 
         return Inertia::render('products/Index', [
             'products' => $products,
             'languages' => $languages,
-            'selectedLanguage' => $languageId
+            'selectedLanguage' => $languageId,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
